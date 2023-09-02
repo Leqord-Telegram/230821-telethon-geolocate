@@ -1,0 +1,29 @@
+[auth]
+api_id = 12345
+api_hash = "12345"
+db_user = "telebot_user"
+db_password = "12345"
+
+[limits]
+accuracy_radius = 100
+period_messages_max = 30
+period_time_s = 80000
+flood_error_delay_s = 20000
+message_typing_start_delay_min_s = 1
+message_typing_start_delay_max_s = 4
+message_send_delay_min_s = 2
+message_send_delay_max_s = 8
+user_spam_delay_min_s = 60
+user_spam_delay_max_s = 180
+skipped_user_spam_delay_min_s = 1
+skipped_user_spam_delay_max_s = 3
+geoscan_delay_min_s = 60
+geoscan_delay_max_s = 180
+
+[location]
+accuracy_radius=500
+
+[database]
+db_name = "telebot"
+db_host = "localhost"
+db_port = 5432

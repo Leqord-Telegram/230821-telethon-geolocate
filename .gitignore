@@ -1,0 +1,12 @@
+.idea
+__pycache__
+
+*.session
+*.session-journal
+settings.toml
+
+
+*test.bat
+*test.sh
+*.log
+DELETE_*.py
