@@ -157,21 +157,15 @@ class AccountFactory:
             return values[0]["last_period_timestamp"]
     
     @classmethod
-    async def set_period_messages_counter(cls, session_name: str, counter: int | None) -> bool:
+    async def set_period_messages_counter(cls, session_name: str, counter: int | None) -> None:
         async with cls.pool.acquire() as con:
             async with con.transaction():
-                values = await con.fetch(
-                    'SELECT COUNT(1) FROM sessions WHERE session_name=$1::text', session_name
-                )
-                session_found = values[0]["count"] > 0
-
-                if session_found:
-                    await  con.execute('''
+                await  con.execute('''
                         UPDATE sessions SET period_messages = $1::int4 WHERE session_name = $2::text
                     ''',  
-                    counter, 
-                    session_name)
-            return session_found
+                counter, 
+                session_name)
+            return None
     
     @classmethod
     async def get_period_messages_counter(cls, session_name: str) -> int | None:
