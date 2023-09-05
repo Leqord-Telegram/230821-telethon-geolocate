@@ -78,7 +78,6 @@ class BotGlobalSettings:
             if "accuracy_radius" in data["location"]:
                 self.accuracy_radius = data["location"]["accuracy_radius"]
 
-        
 
         self.api_id = data["auth"]["api_id"]
         self.api_hash = data["auth"]["api_hash"]

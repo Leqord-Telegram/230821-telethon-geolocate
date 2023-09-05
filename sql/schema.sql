@@ -8,9 +8,9 @@ CREATE TABLE "public"."sessions" (
   "longitude" float8 NOT NULL,
   "delta_latitude" float8 NOT NULL DEFAULT 0,
   "delta_longitude" float8 NOT NULL DEFAULT 0,
-  "period_messages" int4,
+  "period_messages" int4 DEFAULT 0,
   "control_group_id" int8,
-  "sleep_until" timestamp,
+  "last_period_timestamp" timestamp,
   PRIMARY KEY ("session_name"),
   CONSTRAINT "phone_number_unique" UNIQUE ("phone_number")
 );

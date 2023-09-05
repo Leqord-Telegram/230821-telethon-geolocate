@@ -6,7 +6,6 @@ db_password = "12345"
 group_hash = "asdads"
 
 [limits]
-accuracy_radius = 100
 period_messages_max = 30
 period_time_s = 80000
 flood_error_delay_s = 20000

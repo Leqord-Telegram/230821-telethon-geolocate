@@ -24,7 +24,7 @@ class Person:
                         INSERT INTO spammed_users(id, timestamp, bot_session) VALUES($1::int8, $2::timestamp, $3::text)
                     ''', 
                     id, datetime.now(), session_name)
-        return not user_already_spammed
+            return not user_already_spammed
     
 class Account:
     def __init__(self, session_name: str, 
@@ -83,7 +83,7 @@ class AccountFactory:
                     account.longitude, 
                     account.delta_latitude, 
                     account.delta_longitude)
-        return session_registered
+            return session_registered
     
     @classmethod
     async def remove_account(cls, session_name: str) -> bool:
@@ -99,7 +99,7 @@ class AccountFactory:
                         DELETE FROM sessions WHERE session_name=$1::text
                     ''', 
                     session_name)
-        return session_registered
+            return session_registered
     
     @classmethod
     async def change_location(cls, session_name: str, 
@@ -121,23 +121,67 @@ class AccountFactory:
                     delta_latitude, 
                     delta_longitude,
                     session_name)
-        return session_found
+            return session_found
 
     @classmethod
-    async def set_sleep_until_timestamp(cls, session_name: str, timestamp: datetime) -> bool:
-        return True
+    async def set_last_period_timestamp(cls, session_name: str, timestamp: datetime | None) -> bool:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT COUNT(1) FROM sessions WHERE session_name=$1::text', session_name
+                )
+                session_found = values[0]["count"] > 0
+
+                if session_found:
+                    if datetime is None:
+                        await  con.execute(f'''
+                            UPDATE sessions SET last_period_timestamp = Null WHERE session_name = $1::text
+                        ''',  
+                        session_name)
+                    else:
+                        await  con.execute(f'''
+                            UPDATE sessions SET last_period_timestamp = $1::timestamp WHERE session_name = $2::text
+                        ''',  
+                        timestamp, 
+                        session_name)
+            return session_found
     
     @classmethod
-    async def get_sleep_until_timestamp(cls, session_name: str, timestamp: str) -> datetime | None:
-        return None
+    async def get_last_period_timestamp(cls, session_name: str) -> datetime | None:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT last_period_timestamp FROM sessions WHERE session_name=$1::text', session_name
+                )
+
+            return values[0]["last_period_timestamp"]
     
     @classmethod
-    async def set_period_messages_counter(cls, session_name: str, counter: int) -> bool:
-        return True
+    async def set_period_messages_counter(cls, session_name: str, counter: int | None) -> bool:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT COUNT(1) FROM sessions WHERE session_name=$1::text', session_name
+                )
+                session_found = values[0]["count"] > 0
+
+                if session_found:
+                    await  con.execute('''
+                        UPDATE sessions SET period_messages = $1::int4 WHERE session_name = $2::text
+                    ''',  
+                    counter, 
+                    session_name)
+            return session_found
     
     @classmethod
     async def get_period_messages_counter(cls, session_name: str) -> int | None:
-        return True
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT period_messages FROM sessions WHERE session_name=$1::text', session_name
+                )
+
+            return values[0]["period_messages"]
     
     @classmethod
     async def set_control_group_id(cls, session_name: str, id: int) -> bool:
@@ -154,7 +198,7 @@ class AccountFactory:
                     ''',  
                     id, 
                     session_name)
-        return session_found
+            return session_found
     
     @classmethod
     async def get_control_group_id(cls, session_name: str) -> int | None:
@@ -164,4 +208,14 @@ class AccountFactory:
                     'SELECT control_group_id FROM sessions WHERE session_name=$1::text', session_name
                 )
 
-        return values[0]["control_group_id"]
+            return values[0]["control_group_id"]
+        
+    @classmethod
+    async def reset_control_group(cls) -> None:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    "UPDATE sessions SET control_group_id = Null"
+                )
+
+            return None

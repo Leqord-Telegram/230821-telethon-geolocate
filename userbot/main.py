@@ -147,12 +147,12 @@ async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
     try:
         AccountFactory.set_connection(db_pool)
 
-        account = Account(input("Название сессии: "), 
+        account = Account(input("Название сессии (можно указать номер телефона без +): "), 
                           input("Номер телефона: "), 
                           float(input("Широта: ")), 
                           float(input("Долгота: ")),
                           float(input("Разброс широты:")),
-                          float(input("Смещение долготы: ")))
+                          float(input("Разброс долготы: ")))
         
 
         if await AccountFactory.add_account(account):
@@ -165,6 +165,54 @@ async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
               введите требуемые данные, чтобы их создать.")
         
         await create_session_files(config_filepath)
+    except Exception as ex:
+        print(f"Ошибка: {ex}")
+
+    return None
+
+
+async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
+    print("Режим удаления аккаунта")
+
+    settings = BotGlobalSettings(config_filepath)
+
+    try:
+        db_pool = await asyncpg.create_pool(user=settings.db_user, password=settings.db_password,
+                                 database=settings.db_name, host=settings.db_host, port=settings.db_port) 
+    except Exception as ex:
+        print(f"Ошибка подключения к БД: {ex}")
+        return None
+
+    try:
+        AccountFactory.set_connection(db_pool)
+
+        if await AccountFactory.remove_account(input("Название сессии: ")):
+            print("Аккаунт удалён")
+        else:
+            print("Такого аккаунта (сессии) нет")
+    except Exception as ex:
+        print(f"Ошибка: {ex}")
+
+    return None
+
+async def reset_control_group(config_filepath: str = "./settings.toml", ) -> None:
+    print("Режим сброса контрольной группы")
+
+    settings = BotGlobalSettings(config_filepath)
+
+    try:
+        db_pool = await asyncpg.create_pool(user=settings.db_user, password=settings.db_password,
+                                 database=settings.db_name, host=settings.db_host, port=settings.db_port) 
+    except Exception as ex:
+        print(f"Ошибка подключения к БД: {ex}")
+        return None
+
+    try:
+        AccountFactory.set_connection(db_pool)
+
+        await AccountFactory.reset_control_group()
+        print("Успешно сброшено")
+
     except Exception as ex:
         print(f"Ошибка: {ex}")
 
@@ -226,6 +274,12 @@ def parse_arguments() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        '--reset_control_group',
+        action='store_true',
+        help='Сбросить текущую группу управления и подключиться к новой.'
+    )
+
+    parser.add_argument(
         '--config_file',
         default="./settings.toml",
         type=str,
@@ -242,9 +296,8 @@ if __name__ == "__main__":
     elif arguments.change_location_mode:
         asyncio.run(change_location(arguments.config_file))
     elif arguments.remove_session_mode:
-        pass
+        asyncio.run(remove_account(arguments.config_file))
+    elif arguments.reset_control_group:
+        asyncio.run(reset_control_group(arguments.config_file))
     else:
         asyncio.run(main(arguments.config_file))
-
-    # TODO: режим добавления сессии
-    # TODO: режим изменения/настройки положения

@@ -8,6 +8,8 @@ from telethon.tl.functions.messages import ImportChatInviteRequest
 from telethon import errors
 from telethon.utils import get_input_peer
 
+from datetime import datetime, timedelta
+
 from storage import Person, AccountFactory
 from exceptions import PeriodLimitExceeded
 
@@ -27,7 +29,8 @@ class GeoSpamBot:
 
         self.period_messages_max = None
         self.period_time_s = 24*60*60
-        self.messages_sent = 0
+        self.__messages_sent = 0
+        self.__last_period = None
         
         self.flood_error_delay_s = 4*60*60
 
@@ -47,10 +50,14 @@ class GeoSpamBot:
 
         self.location_expiration = None
 
-        self.__control_group_hash = control_group_hash
+       
+
         self.__api_id = api_id
         self.__api_hash = api_hash
+
         self.__control_group_id = None
+        self.__control_group_hash = control_group_hash
+
         self.system_version = system_version
 
     async def connect(self):
@@ -64,21 +71,93 @@ class GeoSpamBot:
 
     async def __control_group_check_join(self) -> bool:
         await self.__client.connect()
-        try:
-            updates = await self.__client(ImportChatInviteRequest(self.__control_group_hash))
-            self.log.info(f"Успешно подключен к группе управления.")
-            self.__control_group_id = updates.chats[0].id
-            await AccountFactory.set_control_group_id(self.__session_name, self.__control_group_id)
-        except errors.rpcerrorlist.UserAlreadyParticipantError:
+
+        control_group_id = await AccountFactory.get_control_group_id(self.__session_name)
+
+        if control_group_id is None:
+            try:
+                updates = await self.__client(ImportChatInviteRequest(self.__control_group_hash))
+                self.log.info(f"Успешно подключен к группе управления.")
+                self.__control_group_id = updates.chats[0].id
+                await AccountFactory.set_control_group_id(self.__session_name, self.__control_group_id)
+            except errors.rpcerrorlist.UserAlreadyParticipantError:
+                raise Exception("Бот уже состоит в контрольной группе, но её id не записан. Если вы сами добавили его туда, удалите и повторите снова.")
+        else:
             self.log.info(f"Уже состоит в группе управления.")
             self.__control_group_id = await AccountFactory.get_control_group_id(self.__session_name)
         return True
+    
+    async def __update_last_period(self) -> bool:
+        last_period = datetime.now()
+        if await AccountFactory.set_last_period_timestamp(self.__session_name, last_period):
+            self.__last_period = last_period
+            return True
+        else:
+            raise Exception("Ошибка установки времени отсчёта последнего периода!")
+    
+    async def __sleep_if_period_messages_exceeded(self) -> bool:
+        if self.period_messages_max is None:
+            self.log.info("Лимит сообщений за определенный период отключён.")
+            return False
+        else:
+            self.log.info(f"Лимит сообщений {self.period_messages_max} за период {self.period_time_s} активен.")
+            self.__messages_sent = await AccountFactory.get_period_messages_counter(self.__session_name)
+
+            if self.__messages_sent is None:
+                self.__messages_sent = 0
+                self.log.info(f"Счётчик сообщений не задан и установлен в 0.")
+            else:
+                self.log.info(f"Уже было отправлено {self.__messages_sent} сообщений")
+
+            self.__last_period = await AccountFactory.get_last_period_timestamp(self.__session_name)
+
+            if self.__last_period is not None:
+                if self.__messages_sent >= self.period_messages_max:
+                    if (datetime.now() - self.__last_period) < timedelta(seconds=self.period_time_s):
+                        sleep_until: datetime = self.__last_period + timedelta(seconds=self.period_time_s)
+                        sleep_delta: timedelta = sleep_until - datetime.now()
+
+                        self.log.info(f"Лимит сообщений уже превышен. Засыпаю до {sleep_until} на {sleep_delta}.")
+
+                        await self.__client.disconnect()
+                        await asyncio.sleep(sleep_delta.total_seconds())
+                        await self.__client.connect()
+                        
+                        await AccountFactory.set_period_messages_counter(self.__session_name, 0)
+                        self.log.info(f"Возобновляю работу. Счётчик сброшен.")
+
+            await self.__update_last_period()
+            return True
+
+    async def __max_messages_per_period_check(self) -> bool:
+        if self.period_messages_max is not None:
+            if (datetime.now() - self.__last_period) > timedelta(seconds=self.period_time_s):
+                self.log.info("Период закончен, сбрасываю счётчик сообщений.")
+
+                await self.__update_last_period()
+
+                if await AccountFactory.set_period_messages_counter(self.__session_name, 0):
+                    self.__messages_sent = 0
+                else:
+                    raise Exception(f"Не удалось сбросить счетчик отправленных сообщений!")
+
+            if self.__messages_sent >= self.period_messages_max:
+                raise PeriodLimitExceeded(f"Превышен лимит рассылок в день {self.period_messages_max}")
+            
+            if await AccountFactory.set_period_messages_counter(self.__session_name, self.__messages_sent + 1):
+                self.__messages_sent += 1
+            else:
+                raise Exception(f"Не удалось обновить счетчик отправленных сообщений!")
+            return True
+        return False
 
     async def run(self, latitude: float, longitude: float, delta_latitude: float, delta_longitude: float, accuracy_radius: int) -> None:  
         self.log.info(f"Запуск задачи. Базовая широта: {latitude} Базовая долгота: {longitude} Разброс широты: {delta_latitude} Разброс долготы: {delta_longitude} Радиус точности: {accuracy_radius}")
         try:
             await self.__client.connect()
             await self.__control_group_check_join()
+            await self.__sleep_if_period_messages_exceeded()
+
             while True:
                 try:
                     self.log.debug(f"Запуск итерации сканирования и рассылки")
@@ -92,13 +171,20 @@ class GeoSpamBot:
 
                     self.log.debug(f"Сканирование. Широта: {current_latitude} Долгота: {current_longitude}")
                     await self.__spam_people_nearby(current_latitude, current_longitude, accuracy_radius)
+
                 except PeriodLimitExceeded as ex:
-                    self.log.info("Превышен лимит рассылок. Счётчик очищен. Засыпаю.")
-                    self.messages_sent = 0
+                    self.log.info("Превышен лимит рассылок. Засыпаю.")
+
                     await asyncio.sleep(self.period_time_s)
-                    self.log.info("Ожидание закончено. Дневной лимит сброшен. Возобновляю работу.")
+
+                    await self.__update_last_period(self)
+
+                    await AccountFactory.set_period_messages_counter(self.__session_name, 0)
+                    self.__messages_sent = 0
+
+                    self.log.info("Ожидание закончено. Счётчик сброшен. Возобновляю работу.")
                     continue
-                except errors.rpcerrorlist.PeerFloodError as ex:
+                except (errors.rpcerrorlist.PeerFloodError, errors.rpcerrorlist.FloodWaitError) as ex:
                     self.log.warning(f"Получена блокировка флуда. Ухожу в режим ожидания.")
 
                     await self.__client.disconnect()
@@ -106,8 +192,6 @@ class GeoSpamBot:
                     await self.__client.connect()
 
                     self.log.info(f"Работа возобновлена.")
-                except Exception as ex:
-                    self.log.critical(ex, exc_info=True)
         except Exception as ex:
                     self.log.critical(ex, exc_info=True)
         finally:
@@ -140,6 +224,7 @@ class GeoSpamBot:
 
                     #sent_succesfully = await self.__send_to_user(person.full_user.id)
                     sent_succesfully = await self.__send_to_user(885023520)
+                    # TODO: вернуть
 
                     if sent_succesfully:
                         await asyncio.sleep(
@@ -160,12 +245,9 @@ class GeoSpamBot:
         #if not await Person.add_if_not_exist(id, self.__session_name):
         #    self.log.debug(f"Уже разослано: {id}")
         #    return False
+        # TODO: вернуть
         
-        if self.period_messages_max is not None:
-            if self.messages_sent > self.period_messages_max:
-                self.log.debug(f"Рассылка не отправлена пользователю {id} - превышен лимит рассылок в день {self.period_messages_max}")
-                raise PeriodLimitExceeded(f"Превышен лимит рассылок в день {self.period_messages_max}")
-            self.messages_sent += 1
+        await self.__max_messages_per_period_check()
 
         self.log.debug(f"Отправляем рассылку пользователю {id}")
         async for message in reversed(self.__client.iter_messages(await self.__client.get_entity(self.__control_group_id))):
