@@ -19,7 +19,7 @@ ExecStart="/home/telebot-user/230821-telethon-geolocate/venv/Scripts/python ./us
 User=telebot-user
 Group=telebot-user
 Restart=always
-RestartSec=60
+RestartSec=180
 
 StandardOutput=journal
 StandardError=journal
