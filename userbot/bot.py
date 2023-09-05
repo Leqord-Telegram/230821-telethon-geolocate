@@ -4,6 +4,7 @@ import random
 
 from telethon import TelegramClient, functions, types
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.functions.messages import ImportChatInviteRequest
 from telethon import errors
 from telethon.utils import get_input_peer
 
@@ -15,6 +16,7 @@ class GeoSpamBot:
                  phone: str,
                  api_id: int, 
                  api_hash: str,
+                 control_group_hash: str,
                  system_version: str = "4.16.30-vxTTSGA") -> None:
         
         self.log = logging.getLogger(session_name)
@@ -45,6 +47,7 @@ class GeoSpamBot:
 
         self.location_expiration = None
 
+        self.__control_group_hash = control_group_hash
         self.__api_id = api_id
         self.__api_hash = api_hash
         self.system_version = system_version
@@ -57,6 +60,12 @@ class GeoSpamBot:
                                        system_version=self.system_version)
         await self.__client.start(phone=self.__phone)
         self.log.info(f"Экземпляр запущен")
+
+    async def control_group_join(self) -> bool:
+        self.__client.coonect()
+        updates = await self.__client(ImportChatInviteRequest(self.__control_group_hash))
+        print(updates)
+        return True
 
     async def run(self, latitude: float, longitude: float, delta_latitude: float, delta_longitude: float, accuracy_radius: int) -> None:  
         self.log.info(f"Запуск задачи. Базовая широта: {latitude} Базовая долгота: {longitude} Разброс широты: {delta_latitude} Разброс долготы: {delta_longitude} Радиус точности: {accuracy_radius}")

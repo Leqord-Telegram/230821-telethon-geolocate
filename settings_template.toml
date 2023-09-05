@@ -3,6 +3,7 @@ api_id = 12345
 api_hash = "12345"
 db_user = "telebot_user"
 db_password = "12345"
+group_hash = "asdads"
 
 [limits]
 accuracy_radius = 100

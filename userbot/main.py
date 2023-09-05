@@ -49,6 +49,7 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
                          account.phone_number, 
                          settings.api_id, 
                          settings.api_hash, 
+                         settings.control_group_hash,
                          settings.system_version)
         
         bot.log.setLevel(logging.DEBUG)
@@ -76,8 +77,11 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
 
         bot.location_expiration = settings.location_expiration
 
+        
         try:
             await bot.connect()
+            await bot.control_group_join(settings.control_group_hash)
+
             bot_task_list.append(
             asyncio.create_task(
                 bot.run(account.latitude, 
@@ -92,6 +96,8 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
             log.error(f"Ошибка запуска {account.session_name}: {ex}")
     
     log.info("Запуск экземпляров завершён.")
+
+    return None
 
     await asyncio.wait(bot_task_list)
     return None

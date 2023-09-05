@@ -82,6 +82,7 @@ class BotGlobalSettings:
 
         self.api_id = data["auth"]["api_id"]
         self.api_hash = data["auth"]["api_hash"]
+        self.group_hash = data["auth"]["group_hash"]
         self.db_user = data["auth"]["db_user"]
         self.db_password = data["auth"]["db_password"]
         
