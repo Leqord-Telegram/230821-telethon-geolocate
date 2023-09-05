@@ -6,6 +6,8 @@ apt install postgresql postgresql-contrib
 systemctl enable postgresql
 systemctl start postgresql
 
+sleep 15
+
 sudo -i -u postgres psql -U postgres -a -f "./sql/init.sql"
 sudo -i -u postgres psql -U postgres -d telebot -a -f "./sql/schema.sql"
 
