@@ -218,6 +218,12 @@ def parse_arguments() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        '--remove_session_mode',
+        action='store_true',
+        help='Войти в режим изменения удаления сессии.'
+    )
+
+    parser.add_argument(
         '--config_file',
         default="./settings.toml",
         type=str,
@@ -233,6 +239,8 @@ if __name__ == "__main__":
         asyncio.run(reg_new_account(arguments.config_file))
     elif arguments.change_location_mode:
         asyncio.run(change_location(arguments.config_file))
+    elif arguments.remove_session_mode:
+        pass
     else:
         asyncio.run(main(arguments.config_file))
 

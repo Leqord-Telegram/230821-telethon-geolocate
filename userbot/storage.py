@@ -65,7 +65,7 @@ class AccountFactory:
         return account_list
 
     @classmethod
-    async def add_account(cls, account: Account) -> True:
+    async def add_account(cls, account: Account) -> bool:
         async with cls.pool.acquire() as con:
             async with con.transaction():
                 values = await con.fetch(
@@ -83,6 +83,22 @@ class AccountFactory:
                     account.longitude, 
                     account.delta_latitude, 
                     account.delta_longitude)
+        return session_registered
+    
+    @classmethod
+    async def remove_account(cls, session_name: str) -> bool:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT COUNT(1) FROM sessions WHERE session_name=$1::text', session_name
+                )
+                session_registered = values[0]["count"] > 0
+
+                if session_registered:
+                    await  con.execute('''
+                        DELETE FROM sessions WHERE session_name=$1::text
+                    ''', 
+                    session_name)
         return session_registered
     
     @classmethod
