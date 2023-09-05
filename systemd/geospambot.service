@@ -14,7 +14,7 @@ NoNewPrivileges=true
 
 WorkingDirectory=/home/telebot-user/230821-telethon-geolocate/
 
-ExecStart=sh /home/telebot-user/230821-telethon-geolocate/manage_bot_start_all.sh
+ExecStart="/home/telebot-user/230821-telethon-geolocate/venv/Scripts/python ./userbot/main.py"
 
 User=telebot-user
 Group=telebot-user

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "User telebot-user should have been created! useradd -m -U telebot-user"
 
 apt install postgresql postgresql-contrib
