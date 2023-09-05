@@ -140,7 +140,7 @@ class GeoSpamBot:
                         await asyncio.sleep(sleep_delta.total_seconds())
                         await self.__client.connect()
                         
-                        await self.__update_last_period(self)
+                        await self.__update_last_period()
                         await self.__set_message_counter(0)
                         self.log.info(f"Возобновляю работу. Счётчик сброшен.")
             else:
