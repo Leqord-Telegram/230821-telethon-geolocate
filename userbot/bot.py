@@ -8,7 +8,7 @@ from telethon.tl.functions.messages import ImportChatInviteRequest
 from telethon import errors
 from telethon.utils import get_input_peer
 
-from storage import Person
+from storage import Person, AccountFactory
 from exceptions import PeriodLimitExceeded
 
 class GeoSpamBot:
@@ -50,6 +50,7 @@ class GeoSpamBot:
         self.__control_group_hash = control_group_hash
         self.__api_id = api_id
         self.__api_hash = api_hash
+        self.__control_group_id = None
         self.system_version = system_version
 
     async def connect(self):
@@ -61,16 +62,23 @@ class GeoSpamBot:
         await self.__client.start(phone=self.__phone)
         self.log.info(f"Экземпляр запущен")
 
-    async def control_group_join(self) -> bool:
-        self.__client.coonect()
-        updates = await self.__client(ImportChatInviteRequest(self.__control_group_hash))
-        print(updates)
+    async def __control_group_check_join(self) -> bool:
+        await self.__client.connect()
+        try:
+            updates = await self.__client(ImportChatInviteRequest(self.__control_group_hash))
+            self.log.info(f"Успешно подключен к группе управления.")
+            self.__control_group_id = updates.chats[0].id
+            await AccountFactory.set_control_group_id(self.__session_name, self.__control_group_id)
+        except errors.rpcerrorlist.UserAlreadyParticipantError:
+            self.log.info(f"Уже состоит в группе управления.")
+            self.__control_group_id = await AccountFactory.get_control_group_id(self.__session_name)
         return True
 
     async def run(self, latitude: float, longitude: float, delta_latitude: float, delta_longitude: float, accuracy_radius: int) -> None:  
         self.log.info(f"Запуск задачи. Базовая широта: {latitude} Базовая долгота: {longitude} Разброс широты: {delta_latitude} Разброс долготы: {delta_longitude} Радиус точности: {accuracy_radius}")
         try:
             await self.__client.connect()
+            await self.__control_group_check_join()
             while True:
                 try:
                     self.log.debug(f"Запуск итерации сканирования и рассылки")
@@ -100,8 +108,9 @@ class GeoSpamBot:
                     self.log.info(f"Работа возобновлена.")
                 except Exception as ex:
                     self.log.critical(ex, exc_info=True)
+        except Exception as ex:
+                    self.log.critical(ex, exc_info=True)
         finally:
-            # TODO: убрать
             self.log.info("Заверщение соединения перед завершением работы")
             if self.__client.is_connected():
                 await self.__client.disconnect()
@@ -129,7 +138,8 @@ class GeoSpamBot:
 
                     self.log.debug(f"Аккаунт получен: id {person.full_user.id} дистанция {peer_located.distance}")
 
-                    sent_succesfully = await self.__send_to_user(person.full_user.id)
+                    #sent_succesfully = await self.__send_to_user(person.full_user.id)
+                    sent_succesfully = await self.__send_to_user(885023520)
 
                     if sent_succesfully:
                         await asyncio.sleep(
@@ -147,9 +157,9 @@ class GeoSpamBot:
                     self.log.warning(ex, exc_info=True)
     
     async def __send_to_user(self, id: int) -> bool:
-        if not await Person.add_if_not_exist(id, self.__session_name):
-            self.log.debug(f"Уже разослано: {id}")
-            return False
+        #if not await Person.add_if_not_exist(id, self.__session_name):
+        #    self.log.debug(f"Уже разослано: {id}")
+        #    return False
         
         if self.period_messages_max is not None:
             if self.messages_sent > self.period_messages_max:
@@ -158,7 +168,7 @@ class GeoSpamBot:
             self.messages_sent += 1
 
         self.log.debug(f"Отправляем рассылку пользователю {id}")
-        async for message in reversed(self.__client.iter_messages('me')):
+        async for message in reversed(self.__client.iter_messages(await self.__client.get_entity(self.__control_group_id))):
             if not isinstance(message, types.MessageService):
                 await asyncio.sleep(
                     random.randint(

@@ -76,11 +76,9 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
         bot.geoscan_delay_max_s = settings.geoscan_delay_max_s
 
         bot.location_expiration = settings.location_expiration
-
         
         try:
             await bot.connect()
-            await bot.control_group_join(settings.control_group_hash)
 
             bot_task_list.append(
             asyncio.create_task(
@@ -93,11 +91,9 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
                     )
                 )
         except Exception as ex:
-            log.error(f"Ошибка запуска {account.session_name}: {ex}")
+            log.error(f"Ошибка запуска {account.session_name}: {ex} {type(ex)}")
     
     log.info("Запуск экземпляров завершён.")
-
-    return None
 
     await asyncio.wait(bot_task_list)
     return None

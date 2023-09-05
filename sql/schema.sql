@@ -8,6 +8,9 @@ CREATE TABLE "public"."sessions" (
   "longitude" float8 NOT NULL,
   "delta_latitude" float8 NOT NULL DEFAULT 0,
   "delta_longitude" float8 NOT NULL DEFAULT 0,
+  "period_messages" int4,
+  "control_group_id" int8,
+  "sleep_until" timestamp,
   PRIMARY KEY ("session_name"),
   CONSTRAINT "phone_number_unique" UNIQUE ("phone_number")
 );
@@ -19,5 +22,5 @@ CREATE TABLE "public"."spammed_users" (
   PRIMARY KEY ("id")
 );
 
-GRANT Delete, Insert, References, Select, Trigger, Truncate, Update ON TABLE "public"."sessions" TO "telebot_user";
-GRANT Delete, Insert, References, Select, Trigger, Truncate, Update ON TABLE "public"."spammed_users" TO "telebot_user";
+GRANT Delete, Insert, References, Select, Update ON TABLE "public"."sessions" TO "telebot_user";
+GRANT Delete, Insert, References, Select, Update ON TABLE "public"."spammed_users" TO "telebot_user";

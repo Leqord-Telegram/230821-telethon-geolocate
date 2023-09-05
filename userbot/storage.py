@@ -122,3 +122,46 @@ class AccountFactory:
                     delta_longitude,
                     session_name)
         return session_found
+
+    @classmethod
+    async def set_sleep_until_timestamp(cls, session_name: str, timestamp: datetime) -> bool:
+        return True
+    
+    @classmethod
+    async def get_sleep_until_timestamp(cls, session_name: str, timestamp: str) -> datetime | None:
+        return None
+    
+    @classmethod
+    async def set_period_messages_counter(cls, session_name: str, counter: int) -> bool:
+        return True
+    
+    @classmethod
+    async def get_period_messages_counter(cls, session_name: str) -> int | None:
+        return True
+    
+    @classmethod
+    async def set_control_group_id(cls, session_name: str, id: int) -> bool:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT COUNT(1) FROM sessions WHERE session_name=$1::text', session_name
+                )
+                session_found = values[0]["count"] > 0
+
+                if session_found:
+                    await  con.execute('''
+                        UPDATE sessions SET control_group_id = $1::int8 WHERE session_name = $2::text
+                    ''',  
+                    id, 
+                    session_name)
+        return session_found
+    
+    @classmethod
+    async def get_control_group_id(cls, session_name: str) -> int | None:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    'SELECT control_group_id FROM sessions WHERE session_name=$1::text', session_name
+                )
+
+        return values[0]["control_group_id"]
