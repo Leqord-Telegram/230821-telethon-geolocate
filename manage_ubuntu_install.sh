@@ -6,17 +6,15 @@ apt install postgresql postgresql-contrib
 systemctl enable postgresql
 systemctl start postgresql
 
-su postgres
-psql -U postgres -a -f "./sql/init.sql"
-psql -U postgres -d telebot -a -f "./sql/schema.sql"
-exit
+sudo -i -u postgres psql -U postgres -a -f "./sql/init.sql"
+sudo -i -u postgres psql -U postgres -d telebot -a -f "./sql/schema.sql"
 
 apt install python3 python3-pip python3-venv
 
-su telebot-user
-python -m venv venv
-source venv/bin/activate
-pip install -r ./requirements.txt
+
+sudo -i -u telebot-user python -m venv venv
+sudo -i -u telebot-user source venv/bin/activate
+sudo -i -u telebot-user pip install -r ./requirements.txt
 
 
 cp "./systemd/geospambot.service" "./systemd/lib/user/geospambot.service"
