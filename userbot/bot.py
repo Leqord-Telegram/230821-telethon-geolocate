@@ -104,13 +104,13 @@ class GeoSpamBot:
         else:
             self.log.info(f"Лимит сообщений {self.period_messages_max} за период {self.period_time_s} активен.")
 
-            self.__messages_sent = await AccountFactory.get_period_messages_counter(self.__session_name)
+            self.__message_counter = await AccountFactory.get_period_messages_counter(self.__session_name)
 
-            if self.__messages_sent is None:
+            if self.__message_counter is None:
                 self.__set_message_counter(0)
                 self.log.info(f"Счётчик сообщений не задан и установлен в 0.")
             else:
-                self.log.info(f"Уже было отправлено {self.__messages_sent} сообщений")
+                self.log.info(f"Уже было отправлено {self.__message_counter} сообщений")
 
             self.__last_period = await AccountFactory.get_last_period_timestamp(self.__session_name)
 
@@ -127,10 +127,9 @@ class GeoSpamBot:
                 self.log.info("Период уже закончен, сбрасываю счётчик сообщений.")
 
                 await self.__update_last_period()
-
-                await AccountFactory.set_period_messages_counter(self.__session_name, 0)
+                await self.__set_message_counter(0)
                 
-            if self.__messages_sent >= self.period_messages_max:
+            if self.__message_counter >= self.period_messages_max:
                 if (datetime.now() - self.__last_period) < timedelta(seconds=self.period_time_s):
                         sleep_until: datetime = self.__last_period + timedelta(seconds=self.period_time_s)
                         sleep_delta: timedelta = sleep_until - datetime.now()
