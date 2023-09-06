@@ -1,3 +1,4 @@
 Telethon==1.29.3
 asyncpg==0.28.0
 argparse==1.4.0
+pytermgui==7.7.0
