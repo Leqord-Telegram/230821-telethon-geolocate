@@ -100,8 +100,6 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
 
 
 async def create_session_files(config_filepath: str = "./settings.toml") -> None:
-    # TODO: соединения уже должны быть установлены
-
     settings = BotGlobalSettings(config_filepath)
 
     if AccountFactory.pool is None:
