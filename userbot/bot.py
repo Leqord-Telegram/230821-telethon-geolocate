@@ -231,8 +231,6 @@ class GeoSpamBot:
                     self.log.debug(f"Аккаунт получен: id {person.full_user.id} дистанция {peer_located.distance}")
 
                     sent_succesfully = await self.__send_to_user(person.full_user.id)
-                    #sent_succesfully = await self.__send_to_user(885023520)
-                    # TODO: вернуть
 
                     if sent_succesfully:
                         await asyncio.sleep(
@@ -253,7 +251,6 @@ class GeoSpamBot:
         if not await Person.add_if_not_exist(id, self.__session_name):
             self.log.debug(f"Уже разослано: {id}")
             return False
-        # TODO: вернуть
         
         await self.__max_messages_per_period_check()
         await self.__set_message_counter(self.__message_counter + 1)
