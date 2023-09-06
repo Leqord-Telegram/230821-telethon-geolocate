@@ -177,6 +177,8 @@ async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
 
     settings = BotGlobalSettings(config_filepath)
 
+    
+
     try:
         db_pool = await asyncpg.create_pool(user=settings.db_user, password=settings.db_password,
                                  database=settings.db_name, host=settings.db_host, port=settings.db_port) 
@@ -187,7 +189,23 @@ async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
     try:
         AccountFactory.set_connection(db_pool)
 
-        if await AccountFactory.remove_account(input("Название сессии: ")):
+        session_name: str = input("Название сессии:")
+        phone_number: str = input("Номер телефона:")
+
+        bot = GeoSpamBot(session_name, 
+                         phone_number, 
+                         settings.api_id, 
+                         settings.api_hash, 
+                         settings.system_version)
+
+        try:
+            await bot.connect()
+        except Exception as ex:
+            print(f"Ошибка запуска {bot.session_name}: {ex}")
+
+        await bot.control_group_leave()
+
+        if await AccountFactory.remove_account(session_name):
             print("Аккаунт удалён")
         else:
             print("Такого аккаунта (сессии) нет")
@@ -210,6 +228,22 @@ async def reset_control_group(config_filepath: str = "./settings.toml", ) -> Non
 
     try:
         AccountFactory.set_connection(db_pool)
+
+        accounts = await AccountFactory.get_accounts()
+
+        for account in accounts:
+            print(f"Вход в {account.session_name}")
+            bot = GeoSpamBot(account.session_name, 
+                            account.phone_number, 
+                            settings.api_id, 
+                            settings.api_hash, 
+                            settings.system_version)
+
+            try:
+                await bot.connect()
+                await bot.control_group_leave()
+            except Exception as ex:
+                print(f"Ошибка выхода из группы {account.session_name}: {ex}")
 
         await AccountFactory.reset_control_group()
         print("Успешно сброшено")
@@ -258,18 +292,18 @@ async def change_location(config_filepath: str = "./settings.toml") -> None:
 def parse_arguments() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="GeoSpamBot")
 
-    parser.add_argument('--reg_new_account_mode', 
+    parser.add_argument('--new', 
                         action='store_true',
                     help='Войти в режим регистрации нового аккаунта. Боты запущены не будут.')
 
     parser.add_argument(
-        '--change_location_mode',
+        '--change_location',
         action='store_true',
         help='Войти в режим изменения параметров положения.'
     )
 
     parser.add_argument(
-        '--remove_session_mode',
+        '--remove_session',
         action='store_true',
         help='Войти в режим изменения удаления сессии.'
     )
