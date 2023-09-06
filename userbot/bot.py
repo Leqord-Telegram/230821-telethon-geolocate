@@ -200,8 +200,8 @@ class GeoSpamBot:
                     await self.__client.connect()
 
                     self.log.info(f"Работа возобновлена.")
-        except Exception as ex:
-                    self.log.critical(ex, exc_info=True)
+                except Exception as ex:
+                            self.log.critical(ex, exc_info=True)
         finally:
             self.log.info("Заверщение соединения перед завершением работы")
             if self.__client.is_connected():
@@ -230,8 +230,8 @@ class GeoSpamBot:
 
                     self.log.debug(f"Аккаунт получен: id {person.full_user.id} дистанция {peer_located.distance}")
 
-                    #sent_succesfully = await self.__send_to_user(person.full_user.id)
-                    sent_succesfully = await self.__send_to_user(885023520)
+                    sent_succesfully = await self.__send_to_user(person.full_user.id)
+                    #sent_succesfully = await self.__send_to_user(885023520)
                     # TODO: вернуть
 
                     if sent_succesfully:
@@ -250,9 +250,9 @@ class GeoSpamBot:
                     self.log.warning(ex, exc_info=True)
     
     async def __send_to_user(self, id: int) -> bool:
-        #if not await Person.add_if_not_exist(id, self.__session_name):
-        #    self.log.debug(f"Уже разослано: {id}")
-        #    return False
+        if not await Person.add_if_not_exist(id, self.__session_name):
+            self.log.debug(f"Уже разослано: {id}")
+            return False
         # TODO: вернуть
         
         await self.__max_messages_per_period_check()

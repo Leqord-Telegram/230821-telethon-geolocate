@@ -326,11 +326,11 @@ def parse_arguments() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     arguments = parse_arguments()
 
-    if arguments.reg_new_account_mode:
+    if arguments.new:
         asyncio.run(reg_new_account(arguments.config_file))
-    elif arguments.change_location_mode:
+    elif arguments.change_location:
         asyncio.run(change_location(arguments.config_file))
-    elif arguments.remove_session_mode:
+    elif arguments.remove_session:
         asyncio.run(remove_account(arguments.config_file))
     elif arguments.reset_control_group:
         asyncio.run(reset_control_group(arguments.config_file))
