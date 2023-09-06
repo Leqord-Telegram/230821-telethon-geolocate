@@ -121,7 +121,8 @@ class GeoSpamBot:
 
     async def __max_messages_per_period_check(self) -> bool:
         if self.period_messages_max is not None:
-            if (datetime.now() - self.__last_period) > timedelta(seconds=self.period_time_s):
+            self.log.debug(f"разница {(datetime.now() - self.__last_period)} дельта {timedelta(seconds=self.period_time_s)} сейчас {datetime.now()} период {self.__last_period}")
+            if (datetime.now() - self.__last_period) >= timedelta(seconds=self.period_time_s):
                 self.log.info("Период уже закончен, сбрасываю счётчик сообщений.")
 
                 await self.__update_last_period()
