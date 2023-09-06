@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 ./userbot/main.py --change_location_mode
+./venv/bin/python ./userbot/main.py --change_location_mode

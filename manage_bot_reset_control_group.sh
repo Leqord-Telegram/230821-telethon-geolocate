@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 ./userbot/main.py --reset_control_group
+./venv/bin/python ./userbot/main.py --reset_control_group

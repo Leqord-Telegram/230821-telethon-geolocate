@@ -50,8 +50,6 @@ class GeoSpamBot:
 
         self.location_expiration = None
 
-       
-
         self.__api_id = api_id
         self.__api_hash = api_hash
 

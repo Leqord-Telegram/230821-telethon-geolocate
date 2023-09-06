@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 ./userbot/main.py 
+./venv/bin/python ./userbot/main.py 
