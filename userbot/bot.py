@@ -95,7 +95,7 @@ class GeoSpamBot:
         return None
 
     
-    async def __sleep_if_period_messages_exceeded(self) -> bool:
+    async def __initial_period_sleep_check(self) -> bool:
         if self.period_messages_max is None:
             self.log.info("Лимит сообщений за определенный период отключён.")
             return False
@@ -151,7 +151,7 @@ class GeoSpamBot:
         try:
             await self.__client.connect()
             await self.__control_group_check_join()
-            await self.__sleep_if_period_messages_exceeded()
+            await self.__initial_period_sleep_check()
 
             while True:
                 try:

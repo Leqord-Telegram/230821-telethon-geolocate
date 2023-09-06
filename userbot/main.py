@@ -173,6 +173,7 @@ async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
 
 async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
     print("Режим удаления аккаунта")
+    print("ИСПОЛЬЗУЙТЕ ТОЛЬКО КОГДА БОТЫ ОСТАНОВЛЕНЫ!")
 
     settings = BotGlobalSettings(config_filepath)
 
