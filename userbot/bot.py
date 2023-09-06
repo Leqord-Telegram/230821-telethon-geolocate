@@ -106,7 +106,7 @@ class GeoSpamBot:
             self.__message_counter = await AccountFactory.get_period_messages_counter(self.__session_name)
 
             if self.__message_counter is None:
-                self.__set_message_counter(0)
+                await self.__set_message_counter(0)
                 self.log.info(f"Счётчик сообщений не задан и установлен в 0.")
             else:
                 self.log.info(f"Уже было отправлено {self.__message_counter} сообщений")
@@ -143,9 +143,7 @@ class GeoSpamBot:
                         
                         await self.__update_last_period()
                         await self.__set_message_counter(0)
-                        self.log.info(f"Возобновляю работу. Счётчик сброшен.")
-            else:
-                await self.__set_message_counter(self.__message_counter + 1)
+                        self.log.info(f"Возобновляю работу. Счётчик сброшен.")  
             return True
         return False
 
@@ -234,6 +232,7 @@ class GeoSpamBot:
         # TODO: вернуть
         
         await self.__max_messages_per_period_check()
+        await self.__set_message_counter(self.__message_counter + 1)
 
         self.log.debug(f"Отправляем рассылку пользователю {id}")
         async for message in reversed(self.__client.iter_messages(await self.__client.get_entity(self.__control_group_id))):

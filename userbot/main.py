@@ -149,10 +149,10 @@ async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
 
         account = Account(input("Название сессии (можно указать номер телефона без +): "), 
                           input("Номер телефона: "), 
-                          float(input("Широта: ")), 
-                          float(input("Долгота: ")),
-                          float(input("Разброс широты:")),
-                          float(input("Разброс долготы: ")))
+                          float(input("Широта (разделитель точка): ")), 
+                          float(input("Долгота (разделитель точка): ")),
+                          float(input("Разброс широты (разделитель точка):")),
+                          float(input("Разброс долготы (раделитель точка): ")))
         
 
         if await AccountFactory.add_account(account):
@@ -237,10 +237,10 @@ async def change_location(config_filepath: str = "./settings.toml") -> None:
     try:
         AccountFactory.set_connection(db_pool)
 
-        latitude = float(input("Широта: "))
-        longitude = float(input("Долгота: "))
-        delta_latitude = float(input("Разброс широты: "))
-        delta_longitude = float(input("Разброс долготы: "))
+        latitude = float(input("Широта (разделитель точка): "))
+        longitude = float(input("Долгота (разделитель точка): "))
+        delta_latitude = float(input("Разброс широты (разделитель точка): "))
+        delta_longitude = float(input("Разброс долготы (разделитель точка): "))
 
         if await AccountFactory.change_location(session_name, 
                                                 latitude, longitude, 
