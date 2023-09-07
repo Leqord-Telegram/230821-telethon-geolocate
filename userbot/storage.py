@@ -71,9 +71,9 @@ class AccountFactory:
                 values = await con.fetch(
                     'SELECT COUNT(1) FROM sessions WHERE session_name=$1::text', account.session_name
                 )
-                session_registered = values[0]["count"] > 0
+                exist = values[0]["count"] > 0
 
-                if not session_registered:
+                if not exist:
                     await  con.execute('''
                         INSERT INTO sessions(session_name, phone_number, latitude, longitude, delta_latitude, delta_longitude) VALUES($1::text, $2::text, $3::float8, $4::float8, $5::float8, $6::float8)
                     ''', 
@@ -83,7 +83,7 @@ class AccountFactory:
                     account.longitude, 
                     account.delta_latitude, 
                     account.delta_longitude)
-            return session_registered
+            return not exist
     
     @classmethod
     async def remove_account(cls, session_name: str) -> bool:
