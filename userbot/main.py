@@ -207,8 +207,6 @@ async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
         except Exception as ex:
             print(f"Ошибка {session_name}: {ex}")
 
-        
-
         if await AccountFactory.remove_account(session_name):
             print("Аккаунт удалён")
         else:
