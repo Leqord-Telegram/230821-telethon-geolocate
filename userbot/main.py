@@ -201,11 +201,13 @@ async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
                          settings.system_version)
 
         try:
+            print(f"Пробуем войти в {session_name} чтобы выйти из группы управления")
             await bot.connect()
+            await bot.control_group_leave()
         except Exception as ex:
-            print(f"Ошибка запуска {session_nameк}: {ex}")
+            print(f"Ошибка {session_name}: {ex}")
 
-        await bot.control_group_leave()
+        
 
         if await AccountFactory.remove_account(session_name):
             print("Аккаунт удалён")
