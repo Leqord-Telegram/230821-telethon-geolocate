@@ -192,6 +192,10 @@ class GeoSpamBot:
                     self.log.debug(f"Сканирование. Широта: {current_latitude} Долгота: {current_longitude}")
                     await self.__spam_people_nearby(current_latitude, current_longitude, accuracy_radius)
 
+                    await asyncio.sleep(
+                            random.randint(self.geoscan_delay_min_s, self.geoscan_delay_max_s)
+                    )
+
                 except (errors.rpcerrorlist.PeerFloodError, errors.rpcerrorlist.FloodWaitError) as ex:
                     self.log.warning(f"Получена блокировка флуда. Ухожу в режим ожидания.")
 
