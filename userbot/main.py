@@ -42,7 +42,7 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
     accounts = await AccountFactory.get_accounts()
 
     log.info("Запуск экземпляров")
-    bot_task_list = []
+    bot_task_list: list = []
     for account in accounts:
         log.info(f"Подготовка {account.session_name}")
         bot = GeoSpamBot(account.session_name, 
@@ -92,6 +92,10 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
                 )
         except Exception as ex:
             log.error(f"Ошибка запуска {account.session_name}: {ex} {type(ex)}")
+
+    if not bot_task_list:
+        log.warning("Зарегистрированные аккаунты отсутствуют.")
+        return None
     
     log.info("Запуск экземпляров завершён.")
 
