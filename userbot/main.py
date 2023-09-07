@@ -203,7 +203,7 @@ async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
         try:
             await bot.connect()
         except Exception as ex:
-            print(f"Ошибка запуска {bot.session_name}: {ex}")
+            print(f"Ошибка запуска {session_nameк}: {ex}")
 
         await bot.control_group_leave()
 
