@@ -29,7 +29,7 @@ systemctl status geospambot
 
 Затем можно выполнять команды:
 ```
-python3 ./userbot/main.py --<команда>
+python3 ./userbot/main.py <команда>
 ```
 Если команду не передать, боты будут запущены.
 
