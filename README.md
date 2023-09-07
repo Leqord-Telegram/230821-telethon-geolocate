@@ -25,7 +25,8 @@ systemctl status geospambot
 
 Управление происходит с помощью команд к main.py.
 Предположим, что вы находитесь в директории репозитория 230821-telethon-geolocate.
-Сначала следует активировать venv командой source ./venv/bin/activate для Linux или ./venv/Scripts/activate.bat для windows.
+Сначала следует активировать venv командой 
+```source ./venv/bin/activate``` для Linux или ```./venv/Scripts/activate.bat``` для windows.
 
 Затем можно выполнять команды:
 ```
