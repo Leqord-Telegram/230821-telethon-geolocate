@@ -182,6 +182,7 @@ class GeoSpamBot:
 
             while True:
                 try:
+                    await self.__client.connect()
                     self.log.debug(f"Запуск итерации сканирования и рассылки")
                     current_latitude = latitude
                     current_longitude = longitude
