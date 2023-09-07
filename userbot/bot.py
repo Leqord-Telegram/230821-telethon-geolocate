@@ -209,8 +209,10 @@ class GeoSpamBot:
                     self.log.info(f"Работа возобновлена.")
                 except Exception as ex:
                             self.log.critical(ex, exc_info=True)
+                            await asyncio.sleep(10)
         except Exception as ex:
                             self.log.critical(ex, exc_info=True)
+                            await asyncio.sleep(10)
         finally:
             self.log.info("Заверщение соединения перед завершением работы")
             if self.__client.is_connected():
