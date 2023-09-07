@@ -251,7 +251,7 @@ async def reset_control_group(config_filepath: str = "./settings.toml", ) -> Non
         print("Успешно сброшено")
 
     except Exception as ex:
-        print(f"Ошибка: {ex}")
+        print(f"Ошибка сброса: {ex}")
 
     return None
 
