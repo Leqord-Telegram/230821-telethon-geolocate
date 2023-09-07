@@ -75,7 +75,7 @@ class GeoSpamBot:
 
         if control_group_id is None:
             try:
-                updates = await self.__client(ImportChatInviteRequest(self.__control_group_hash))
+                updates = await self.__client(ImportChatInviteRequest(hash=self.__control_group_hash))
                 self.log.info(f"Успешно подключен к группе управления.")
                 self.__control_group_id = updates.chats[0].id
                 await AccountFactory.set_control_group_id(self.__session_name, self.__control_group_id)
