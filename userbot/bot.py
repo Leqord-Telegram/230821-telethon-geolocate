@@ -222,6 +222,7 @@ class GeoSpamBot:
 
 
     async def __spam_people_nearby(self, latitude: float, longitude: float, accuracy_radius: int) -> None:
+        await self.__client.connect()
         point = await self.__client(functions.contacts.GetLocatedRequest(
                 geo_point=types.InputGeoPoint(lat=latitude, long=longitude, accuracy_radius=accuracy_radius),
                 self_expires=self.location_expiration,
@@ -259,6 +260,7 @@ class GeoSpamBot:
                     self.log.warning(ex, exc_info=True)
     
     async def __send_to_user(self, id: int) -> bool:
+        await self.__client.connect()
         if not await Person.add_if_not_exist(id, self.__session_name):
             self.log.debug(f"Уже разослано: {id}")
             return False
