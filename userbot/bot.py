@@ -208,6 +208,8 @@ class GeoSpamBot:
                     self.log.info(f"Работа возобновлена.")
                 except Exception as ex:
                             self.log.critical(ex)
+        except Exception as ex:
+                            self.log.critical(ex)
         finally:
             self.log.info("Заверщение соединения перед завершением работы")
             if self.__client.is_connected():
