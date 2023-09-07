@@ -298,5 +298,5 @@ class GeoSpamBot:
                     peer=input_peer,
                     action=types.SendMessageCancelAction()
                     ))
-        
+        self.log.debug(f"Отправка пользователю {id} завершена")
         return True
