@@ -151,10 +151,10 @@ async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
 
         account = Account(input("Название сессии (можно указать номер телефона без +): "), 
                           input("Номер телефона: "), 
-                          float(input("Широта (разделитель точка): ")), 
-                          float(input("Долгота (разделитель точка): ")),
-                          float(input("Разброс широты (разделитель точка):")),
-                          float(input("Разброс долготы (раделитель точка): ")))
+                          float(input("Широта: ").replace(',','.')), 
+                          float(input("Долгота: ").replace(',','.')),
+                          float(input("Разброс широты:").replace(',','.')),
+                          float(input("Разброс долготы: ").replace(',','.')))
         
 
         if await AccountFactory.add_account(account):
@@ -256,6 +256,35 @@ async def reset_control_group(config_filepath: str = "./settings.toml", ) -> Non
     return None
 
 
+async def clear_spammed(config_filepath: str = "./settings.toml", ) -> None:
+    print("Режим удаления списка пользователей с рассылкой")
+    print("ЖДУ 15 СЕКУНД")
+
+    await asyncio.sleep(15)
+
+    settings = BotGlobalSettings(config_filepath)
+
+    try:
+        db_pool = await asyncpg.create_pool(user=settings.db_user, password=settings.db_password,
+                                 database=settings.db_name, host=settings.db_host, port=settings.db_port) 
+    except Exception as ex:
+        print(f"Ошибка подключения к БД: {ex}")
+        return None
+
+    try:
+        AccountFactory.set_connection(db_pool)
+
+        AccountFactory.clear_spammed_users()
+
+        await AccountFactory.reset_control_group()
+        print("СПИСОК ПОЛЬЗОВАТЕЛЕЙ ОЧИЩЕН")
+
+    except Exception as ex:
+        print(f"Ошибка: {ex}")
+
+    return None
+
+
 async def change_location(config_filepath: str = "./settings.toml") -> None:
     print(f"Режим изменения параметров положения")
 
@@ -273,10 +302,10 @@ async def change_location(config_filepath: str = "./settings.toml") -> None:
     try:
         AccountFactory.set_connection(db_pool)
 
-        latitude = float(input("Широта (разделитель точка): "))
-        longitude = float(input("Долгота (разделитель точка): "))
-        delta_latitude = float(input("Разброс широты (разделитель точка): "))
-        delta_longitude = float(input("Разброс долготы (разделитель точка): "))
+        latitude = float(input("Широта: ").replace(',','.'))
+        longitude = float(input("Долгота: ").replace(',','.'))
+        delta_latitude = float(input("Разброс широты: ").replace(',','.'))
+        delta_longitude = float(input("Разброс долготы: ").replace(',','.'))
 
         if await AccountFactory.change_location(session_name, 
                                                 latitude, longitude, 
@@ -317,6 +346,12 @@ def parse_arguments() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        '--clear_spammed',
+        action='store_true',
+        help='Очистить список пользователей, которым была совершена рассылка.'
+    )
+
+    parser.add_argument(
         '--config_file',
         default="./settings.toml",
         type=str,
@@ -336,5 +371,7 @@ if __name__ == "__main__":
         asyncio.run(remove_account(arguments.config_file))
     elif arguments.reset_control_group:
         asyncio.run(reset_control_group(arguments.config_file))
+    elif arguments.clear_spammed:
+        asyncio.run(clear_spammed(arguments.config_file))
     else:
         asyncio.run(main(arguments.config_file))

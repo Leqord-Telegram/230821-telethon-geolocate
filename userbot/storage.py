@@ -213,3 +213,13 @@ class AccountFactory:
                 )
 
             return None
+        
+    @classmethod
+    async def clear_spammed_users(cls) -> None:
+        async with cls.pool.acquire() as con:
+            async with con.transaction():
+                values = await con.fetch(
+                    "DELETE FROM spammed_users"
+                )
+
+            return None
