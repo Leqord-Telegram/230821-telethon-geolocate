@@ -12,9 +12,9 @@ ProtectKernelModules=true
 ProtectControlGroups=true
 NoNewPrivileges=true
 
-WorkingDirectory=/telebot-server/230821-telethon-geolocate/
+WorkingDirectory=/home/telebot-user/230821-telethon-geolocate/
 
-ExecStart=/telebot-server/230821-telethon-geolocate/venv/bin/python ./userbot/main.py
+ExecStart=/home/telebot-user/230821-telethon-geolocate/venv/bin/python ./userbot/main.py
 
 User=telebot-user
 Group=telebot-user
