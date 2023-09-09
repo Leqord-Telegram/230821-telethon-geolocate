@@ -274,7 +274,7 @@ async def clear_spammed(config_filepath: str = "./settings.toml", ) -> None:
     try:
         AccountFactory.set_connection(db_pool)
 
-        AccountFactory.clear_spammed_users()
+        await AccountFactory.clear_spammed_users()
 
         await AccountFactory.reset_control_group()
         print("СПИСОК ПОЛЬЗОВАТЕЛЕЙ ОЧИЩЕН")
