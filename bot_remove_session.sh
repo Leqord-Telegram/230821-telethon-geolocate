@@ -2,4 +2,4 @@
 
 source ./venv/bin/activate
 
-python3 ./userbot/main.py --remove_session
+python3.11 ./userbot/main.py --remove_session
