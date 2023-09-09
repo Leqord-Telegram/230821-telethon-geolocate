@@ -192,20 +192,22 @@ async def remove_account(config_filepath: str = "./settings.toml", ) -> None:
         AccountFactory.set_connection(db_pool)
 
         session_name: str = input("Название сессии:")
-        phone_number: str = input("Номер телефона:")
 
-        bot = GeoSpamBot(session_name, 
-                         phone_number, 
-                         settings.api_id, 
-                         settings.api_hash, 
-                         settings.system_version)
+        if input("Был ли произведен вход в аккаунт и группу?(y/n)") == "y":
+            phone_number: str = input("Номер телефона:")
 
-        try:
-            print(f"Пробуем войти в {session_name} чтобы выйти из группы управления")
-            await bot.connect()
-            await bot.control_group_leave()
-        except Exception as ex:
-            print(f"Ошибка {session_name}: {ex}")
+            bot = GeoSpamBot(session_name, 
+                            phone_number, 
+                            settings.api_id, 
+                            settings.api_hash, 
+                            settings.system_version)
+
+            try:
+                print(f"Пробуем войти в {session_name} чтобы выйти из группы управления")
+                await bot.connect()
+                await bot.control_group_leave()
+            except Exception as ex:
+                print(f"Ошибка {session_name}: {ex}")
 
         if await AccountFactory.remove_account(session_name):
             print("Аккаунт удалён")
