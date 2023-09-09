@@ -14,8 +14,8 @@ sudo -i -u postgres psql -d telebot -a -f "/telebot-server/230821-telethon-geolo
 apt install python3.11 python3-pip python3.11-venv
 
 
-sudo -i -u telebot-user python -m venv venv
-sudo -i -u telebot-user source venv/bin/activate
+sudo -i -u telebot-user python3.11 -m venv venv
+sudo -i -u telebot-user source ./venv/bin/activate
 sudo -i -u telebot-user pip install -r ./requirements.txt
 
 

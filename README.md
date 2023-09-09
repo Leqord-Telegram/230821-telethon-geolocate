@@ -16,15 +16,29 @@
 Если бот был установлен на сервере Linux вместе с systemd службой, то запустить, остановить, перезапустить и проверить состояние можно следующим образом:
 
 ```
-systemctl start geospambot
-systemctl stop geospambot
-systemctl restart geospambot
-systemctl status geospambot
+sudo systemctl start geospambot   # запустить бота
+sudo systemctl stop geospambot    # остановить бота
+sudo systemctl restart geospambot # перезапустить бота
+sudo systemctl status geospambot  # статус бота
 ```
 
 ## Управление
 
-Управление происходит с помощью команд к main.py.
+Рекомендуется выполнить команду ```sudo -i -u telebot-user bash``` и перейти в каталог бота ```cd ~/230821-telethon-geolocate```.
+
+Управлять можно как с помощью готовых скриптов в директории репозитория ```/home/telebot-user/230821-telethon-geolocate```, так и с помощью команд.
+
+Скрипты для управления:
+```
+./bot_change_location.sh
+./bot_clear_users.sh
+./bot_new.sh
+./bot_remove_session.sh
+./bot_reset_control_group.sh
+./bot_run.sh
+```
+
+Управление также может происходить с помощью команд к main.py.
 Предположим, что вы находитесь в директории репозитория 230821-telethon-geolocate.
 Сначала следует активировать venv командой 
 ```source ./venv/bin/activate``` для Linux или ```./venv/Scripts/activate.bat``` для windows.

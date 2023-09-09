@@ -1,6 +1,7 @@
 [Unit]
 Description=GeoSpamBot
-After=network.target
+After=network.target postgresql.service
+Requires=postgresql.service
 
 [Service]
 Type=simple
@@ -13,8 +14,8 @@ ProtectControlGroups=true
 NoNewPrivileges=true
 
 WorkingDirectory=/home/telebot-user/230821-telethon-geolocate/
-
-ExecStart=/home/telebot-user/230821-telethon-geolocate/venv/bin/python ./userbot/main.py
+ExecStartPre=/bin/sleep 5
+ExecStart=/home/telebot-user/230821-telethon-geolocate/bot_run.sh
 
 User=telebot-user
 Group=telebot-user

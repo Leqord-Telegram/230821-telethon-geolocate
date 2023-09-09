@@ -162,9 +162,9 @@ async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
         else:
             print("Такой аккаунт уже существует")
 
-        print("Сейчас мы попытаемся войти во все добавленные аккаунты. \
-              Если для каких-то отсутствуют актуальные файлы сессий, \
-              введите требуемые данные, чтобы их создать.")
+        print("Сейчас мы попытаемся войти во все добавленные аккаунты.")
+        print("Если для каких-то отсутствуют актуальные файлы сессий, ")
+        print("введите требуемые данные, чтобы их создать.")
         
         await create_session_files(config_filepath)
     except Exception as ex:
@@ -276,7 +276,7 @@ async def clear_spammed(config_filepath: str = "./settings.toml", ) -> None:
     try:
         AccountFactory.set_connection(db_pool)
 
-        AccountFactory.clear_spammed_users()
+        await AccountFactory.clear_spammed_users()
 
         await AccountFactory.reset_control_group()
         print("СПИСОК ПОЛЬЗОВАТЕЛЕЙ ОЧИЩЕН")
