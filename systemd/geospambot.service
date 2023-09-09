@@ -1,6 +1,8 @@
 [Unit]
 Description=GeoSpamBot
-After=network.target
+After=postgresql
+Requires=postgresql
+
 
 [Service]
 Type=simple
