@@ -16,10 +16,10 @@
 Если бот был установлен на сервере Linux вместе с systemd службой, то запустить, остановить, перезапустить и проверить состояние можно следующим образом:
 
 ```
-sudo systemctl start geospambot
-sudo systemctl stop geospambot
-sudo systemctl restart geospambot
-sudo systemctl status geospambot
+sudo systemctl start geospambot   # запустить бота
+sudo systemctl stop geospambot    # остановить бота
+sudo systemctl restart geospambot # перезапустить бота
+sudo systemctl status geospambot  # статус бота
 ```
 
 ## Управление
