@@ -50,6 +50,7 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
                          settings.api_id, 
                          settings.api_hash, 
                          settings.control_group_hash,
+                         "iPhone 14 Pro Max",
                          settings.system_version)
         
         bot.log.setLevel(logging.DEBUG)

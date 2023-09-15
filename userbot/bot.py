@@ -20,6 +20,7 @@ class GeoSpamBot:
                  api_id: int, 
                  api_hash: str,
                  control_group_hash: str,
+                 device_model: str = "PC 64bit",
                  system_version: str = "4.16.30-vxTTSGA") -> None:
         
         self.log = logging.getLogger(session_name)
@@ -58,12 +59,14 @@ class GeoSpamBot:
         self.__control_group_hash = control_group_hash
 
         self.system_version = system_version
+        self.device_model = device_model
 
     async def connect(self):
         self.log.info(f"Запуск экземпляра")
         self.__client = TelegramClient(self.__session_name, 
                                        self.__api_id, 
                                        self.__api_hash, 
+                                       device_model=self.device_model,
                                        system_version=self.system_version)
         await self.__client.start(phone=self.__phone)
         self.log.info(f"Экземпляр запущен")
