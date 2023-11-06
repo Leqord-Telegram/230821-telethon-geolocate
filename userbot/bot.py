@@ -215,6 +215,7 @@ class GeoSpamBot:
                             await asyncio.sleep(10)
         except Exception as ex:
                             self.log.critical(ex)
+                            self.log.info(f"type: {type(ex)}")
                             await asyncio.sleep(10)
         finally:
             self.log.info("Заверщение соединения перед завершением работы")
