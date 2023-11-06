@@ -263,6 +263,8 @@ class GeoSpamBot:
                     self.log.warning(ex, exc_info=True)
                 except errors.rpcerrorlist.InputUserDeactivatedError as ex:
                     self.log.warning(ex, exc_info=True)
+                except (errors.rpcerrorlist.PeerFloodError, errors.rpcerrorlist.FloodWaitError) as ex:
+                     raise ex
                 except Exception as ex:
                             self.log.critical(ex)
                             self.log.info(f"type: {type(ex)}")
