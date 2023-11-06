@@ -276,7 +276,7 @@ class GeoSpamBot:
             return False
         
         await self.__max_messages_per_period_check()
-        await self.__set_message_counter(self.__message_counter + 1)
+        
 
         self.log.debug(f"Отправляем рассылку пользователю {id}")
         async for message in reversed(self.__client.iter_messages(await self.__client.get_entity(self.__control_group_id))):
@@ -308,5 +308,7 @@ class GeoSpamBot:
                     peer=input_peer,
                     action=types.SendMessageCancelAction()
                     ))
+	
+	await self.__set_message_counter(self.__message_counter + 1)
         self.log.debug(f"Отправка пользователю {id} завершена")
         return True
