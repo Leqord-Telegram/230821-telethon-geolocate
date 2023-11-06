@@ -268,7 +268,6 @@ class GeoSpamBot:
                             self.log.info(f"type: {type(ex)}")
                             await asyncio.sleep(1)
 
-
     async def __send_to_user(self, id: int) -> bool:
         await self.__client.connect()
         if not await Person.add_if_not_exist(id, self.__session_name):
@@ -308,6 +307,6 @@ class GeoSpamBot:
                     peer=input_peer,
                     action=types.SendMessageCancelAction()
                     ))
-	    await self.__set_message_counter(self.__message_counter + 1)
-	    self.log.debug(f"Отправка пользователю {id} завершена")
+        await self.__set_message_counter(self.__message_counter + 1)
+        self.log.debug(f"Отправка пользователю {id} завершена")
         return True
