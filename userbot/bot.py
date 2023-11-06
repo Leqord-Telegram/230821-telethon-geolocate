@@ -308,7 +308,6 @@ class GeoSpamBot:
                     peer=input_peer,
                     action=types.SendMessageCancelAction()
                     ))
-	
 	await self.__set_message_counter(self.__message_counter + 1)
-        self.log.debug(f"Отправка пользователю {id} завершена")
+	self.log.debug(f"Отправка пользователю {id} завершена")
         return True
