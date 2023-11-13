@@ -384,8 +384,7 @@ def parse_arguments() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         '--show_sessions',
-        default="./settings.toml",
-        type=str,
+        action='store_true',
         help='Вывести все добавленные сессии'
     )
 
