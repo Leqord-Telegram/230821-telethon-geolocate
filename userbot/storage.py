@@ -32,13 +32,20 @@ class Account:
                  latitude: float, 
                  longitude: float,
                  delta_latitude: float, 
-                 delta_longitude: float):
+                 delta_longitude: float,
+                 period_messages: int,
+                 control_group_id: int,
+                 last_period_timestamp: datetime
+                 ):
         self.session_name = session_name
         self.phone_number = phone_number
         self.latitude = latitude
         self.longitude = longitude
         self.delta_latitude = delta_latitude
         self.delta_longitude = delta_longitude
+        self.period_messages = period_messages
+        self.control_group_id = control_group_id
+        self.last_period_timestamp = last_period_timestamp
 
 class AccountFactory:
     pool: asyncpg.Pool = None
@@ -52,7 +59,7 @@ class AccountFactory:
     async def get_accounts(cls) -> list:
         async with cls.pool.acquire() as con:
             records = await con.fetch(
-                'SELECT session_name, phone_number, latitude, longitude, delta_latitude, delta_longitude FROM sessions',
+                'SELECT session_name, phone_number, latitude, longitude, delta_latitude, delta_longitude, period_messages, control_group_id, last_period_timestamp FROM sessions',
             )
 
         account_list = [Account(str(record["session_name"]),
@@ -61,6 +68,9 @@ class AccountFactory:
                                 float(record["longitude"]),
                                 float(record["delta_latitude"]),
                                 float(record["delta_longitude"]),
+                                int(record["period_messages"]),
+                                int(record["control_group_id"]),
+                                datetime(record["last_period_timestamp"]),
                                 ) for record in records]
         return account_list
 

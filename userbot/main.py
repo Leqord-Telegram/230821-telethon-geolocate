@@ -135,6 +135,28 @@ async def create_session_files(config_filepath: str = "./settings.toml") -> None
     return None
 
 
+async def show_sessions(config_filepath: str = "./settings.toml") -> None:
+    settings = BotGlobalSettings(config_filepath)
+
+    if AccountFactory.pool is None:
+        try:
+            db_pool = await asyncpg.create_pool(user=settings.db_user, password=settings.db_password,
+                                 database=settings.db_name, host=settings.db_host, port=settings.db_port) 
+            
+            AccountFactory.set_connection(db_pool)
+        except Exception as ex:
+            print(f"Ошибка подключения к БД: {ex}")
+            return None
+
+    accounts = await AccountFactory.get_accounts()
+
+    print("")
+    for account in accounts:
+        print(f"Сессия: {account.session_name} Телефон: {account.phone_number} Широта: {account.latitude} Долгота: {account.longitude} Разброс широты: {account.delta_latitude} Разброс долготы: {account.delta_longitude} Сообщений за период: {account.period_messages} Группа: {account.control_group_id} Последний период: {account.last_period_timestamp}")
+
+    return None
+
+
 async def reg_new_account(config_filepath: str = "./settings.toml", ) -> None:
     print("Режим регистрации нового аккаунта")
 
@@ -360,6 +382,12 @@ def parse_arguments() -> argparse.ArgumentParser:
         type=str,
         help='Путь к файлу конфигурации.'
     )
+    parser.add_argument(
+        '--show_sessions',
+        default="./settings.toml",
+        type=str,
+        help='Вывести все добавленные сессии'
+    )
 
     return parser.parse_args()
 
@@ -376,5 +404,7 @@ if __name__ == "__main__":
         asyncio.run(reset_control_group(arguments.config_file))
     elif arguments.clear_spammed:
         asyncio.run(clear_spammed(arguments.config_file))
+    elif arguments.show_sessions:
+        asyncio.run(show_sessions(arguments.config_file))
     else:
         asyncio.run(main(arguments.config_file))
