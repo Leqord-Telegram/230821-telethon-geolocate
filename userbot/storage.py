@@ -70,7 +70,7 @@ class AccountFactory:
                                 float(record["delta_longitude"]),
                                 int(record["period_messages"]),
                                 int(record["control_group_id"]),
-                                datetime(record["last_period_timestamp"]),
+                                record["last_period_timestamp"],
                                 ) for record in records]
         return account_list
 
