@@ -84,7 +84,8 @@ class GeoSpamBot:
                 await AccountFactory.set_control_group_id(self.__session_name, self.__control_group_id)
             except errors.rpcerrorlist.UserAlreadyParticipantError:
                 raise Exception("Бот уже состоит в контрольной группе, но её id не записан. Если вы сами добавили его туда, удалите и повторите снова.")
-            except errors.rpcerrorlist.InviteHashExpiredError:
+            except errors.rpcerrorlist.InviteHashExpiredError as ex:
+                self.log.exception(ex)
                 raise Exception("Устарела ссылка для присоединения к уплавляющему каналу! Пересоздайте и запишите новую в settings.toml")
         else:
             self.log.info(f"Уже состоит в группе управления.")
