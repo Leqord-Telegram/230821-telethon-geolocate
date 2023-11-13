@@ -9,7 +9,7 @@ from storage import Account, AccountFactory, Person
 from settings import BotGlobalSettings
 
 
-async def main(config_filepath: str = "./settings.toml", log_filepath: str = "userbot.log") -> None:
+async def main(config_filepath: str = "./settings.toml", log_filepath: str = "userbot.log", dry_start: bool = False) -> None:
     log = logging.getLogger("STARTUP")
     log.setLevel(logging.INFO)
 
@@ -41,7 +41,7 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
     AccountFactory.set_connection(db_pool)
     accounts = await AccountFactory.get_accounts()
 
-    log.info("Запуск экземпляров")
+    log.info(f"Запуск экземпляров {'ХОЛОСТОЙ' if dry_start else ''}")
     bot_task_list: list = []
     for account in accounts:
         log.info(f"Подготовка {account.session_name}")
@@ -87,7 +87,8 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
                         account.longitude,
                         account.delta_latitude,
                         account.delta_longitude,
-                        settings.accuracy_radius
+                        settings.accuracy_radius,
+                        dry_start
                         )
                     )
                 )
@@ -387,6 +388,12 @@ def parse_arguments() -> argparse.ArgumentParser:
         action='store_true',
         help='Вывести все добавленные сессии'
     )
+    parser.add_argument(
+        '--dry_start',
+        action='store_true',
+        help='Холостой старт'
+    )
+
 
     return parser.parse_args()
 
@@ -405,5 +412,7 @@ if __name__ == "__main__":
         asyncio.run(clear_spammed(arguments.config_file))
     elif arguments.show_sessions:
         asyncio.run(show_sessions(arguments.config_file))
+    elif arguments.dry_start:
+        asyncio.run(main(arguments.config_file, True))
     else:
         asyncio.run(main(arguments.config_file))

@@ -36,6 +36,7 @@ sudo systemctl status geospambot  # статус бота
 ./bot_remove_session.sh
 ./bot_reset_control_group.sh
 ./bot_run.sh
+./bot_dry_start.sh
 ```
 
 Управление также может происходить с помощью команд к main.py.

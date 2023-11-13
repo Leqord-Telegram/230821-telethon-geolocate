@@ -176,14 +176,14 @@ class GeoSpamBot:
             return True
         return False
 
-    async def run(self, latitude: float, longitude: float, delta_latitude: float, delta_longitude: float, accuracy_radius: int) -> None:  
+    async def run(self, latitude: float, longitude: float, delta_latitude: float, delta_longitude: float, accuracy_radius: int, dry_start: bool = False) -> None:  
         self.log.info(f"Запуск задачи. Базовая широта: {latitude} Базовая долгота: {longitude} Разброс широты: {delta_latitude} Разброс долготы: {delta_longitude} Радиус точности: {accuracy_radius}")
         try:
             await self.__client.connect()
             await self.__control_group_check_join()
             await self.__initial_period_sleep_check()
 
-            while True:
+            while not dry_start:
                 try:
                     await self.__client.connect()
                     self.log.debug(f"Запуск итерации сканирования и рассылки")
