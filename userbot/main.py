@@ -42,6 +42,7 @@ async def main(config_filepath: str = "./settings.toml", log_filepath: str = "us
     accounts = await AccountFactory.get_accounts()
 
     log.info(f"Запуск экземпляров {'ХОЛОСТОЙ' if dry_start else ''}")
+    log.info(f"Группа управления {settings.control_group_hash}")
     bot_task_list: list = []
     for account in accounts:
         log.info(f"Подготовка {account.session_name}")
