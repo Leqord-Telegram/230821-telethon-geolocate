@@ -33,9 +33,9 @@ class Account:
                  longitude: float,
                  delta_latitude: float, 
                  delta_longitude: float,
-                 period_messages: int,
-                 control_group_id: int,
-                 last_period_timestamp: datetime
+                 period_messages,
+                 control_group_id,
+                 last_period_timestamp
                  ):
         self.session_name = session_name
         self.phone_number = phone_number
@@ -68,8 +68,8 @@ class AccountFactory:
                                 float(record["longitude"]),
                                 float(record["delta_latitude"]),
                                 float(record["delta_longitude"]),
-                                int(record["period_messages"]),
-                                int(record["control_group_id"]),
+                                record["period_messages"],
+                                record["control_group_id"],
                                 record["last_period_timestamp"],
                                 ) for record in records]
         return account_list
