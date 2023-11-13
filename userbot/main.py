@@ -413,6 +413,6 @@ if __name__ == "__main__":
     elif arguments.show_sessions:
         asyncio.run(show_sessions(arguments.config_file))
     elif arguments.dry_start:
-        asyncio.run(main(arguments.config_file, True))
+        asyncio.run(main(arguments.config_file, dry_start=True))
     else:
         asyncio.run(main(arguments.config_file))
