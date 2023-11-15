@@ -33,9 +33,9 @@ class Account:
                  longitude: float,
                  delta_latitude: float, 
                  delta_longitude: float,
-                 period_messages,
-                 control_group_id,
-                 last_period_timestamp
+                 period_messages = None,
+                 control_group_id = None,
+                 last_period_timestamp = None
                  ):
         self.session_name = session_name
         self.phone_number = phone_number
